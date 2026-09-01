@@ -10,15 +10,15 @@ app = FastAPI()
 async def root():
     return {"message":"Random Engine API v1.0.0"}
 
-@app.get("/dog/random")
+@app.get("/random/dog")
 async def get_random_dog_route():
     return await get_random_dog()
 
-@app.get("/meal/random")
+@app.get("/random/meal")
 async def get_random_meal_route():
     return await get_random_meal()
 
-@app.get("/space/random")
+@app.get("/random/space")
 async def get_random_space_route():
     return await get_random_space()
 
