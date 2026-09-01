@@ -1,6 +1,6 @@
 # Random Engine API
 
-A FastAPI service that returns random content from public APIs: a dog photo, a meal recipe, or NASA’s Astronomy Picture of the Day. `GET /random` picks one of those providers at random.
+A FastAPI service that returns random content from public APIs: a dog photo, a meal recipe, NASA’s Astronomy Picture of the Day, or a trivia fact. `GET /random` picks one of those providers at random.
 
 ## Live demo
 
@@ -30,18 +30,19 @@ Health / version check. Confirms the service is running.
 
 ### `GET /random/{category}`
 
-Fetches a random item for one category. Valid values: `dog`, `meal`, `space` (case-insensitive).
+Fetches a random item for one category. Valid values: `dog`, `meal`, `space`, `fact` (case-insensitive).
 
 **Live examples:**
 - [https://random-insights-api.onrender.com/random/dog](https://random-insights-api.onrender.com/random/dog)
 - [https://random-insights-api.onrender.com/random/meal](https://random-insights-api.onrender.com/random/meal)
 - [https://random-insights-api.onrender.com/random/space](https://random-insights-api.onrender.com/random/space)
+- [https://random-insights-api.onrender.com/random/fact](https://random-insights-api.onrender.com/random/fact)
 
 Invalid values (for example `/random/cat`) return **400**:
 
 ```json
 {
-  "detail": "Invalid category 'cat'. Must be one of: dog, meal, space."
+  "detail": "Invalid category 'cat'. Must be one of: dog, meal, space, fact."
 }
 ```
 
@@ -119,9 +120,29 @@ NASA’s Astronomy Picture of the Day ([APOD](https://api.nasa.gov/)). Requires 
 | `status` | Upstream HTTP status |
 | `source` | `"NASA"` |
 
+#### `fact`
+
+A random trivia fact from [API Ninjas](https://www.api-ninjas.com/api/facts). Requires `NINJA_API_KEY` and `NINJA_FACTS_URL` in the environment.
+
+```json
+{
+  "type": "fact",
+  "fact": "Honey never spoils.",
+  "status": 200,
+  "source": "API Ninjas"
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `type` | Always `"fact"` |
+| `fact` | Trivia sentence |
+| `status` | Upstream HTTP status |
+| `source` | `"API Ninjas"` |
+
 ### `GET /random`
 
-Randomly chooses one of the three providers (`dog`, `meal`, or `space`) and returns that provider’s JSON. The `type` field tells you which one you got.
+Randomly chooses one of the four providers (`dog`, `meal`, `space`, or `fact`) and returns that provider’s JSON. The `type` field tells you which one you got.
 
 **Live:** [https://random-insights-api.onrender.com/random](https://random-insights-api.onrender.com/random)
 
@@ -132,10 +153,11 @@ app/
   main.py                 # FastAPI routes
   providers/
     dog.py
+    fact.py
     meal.py
     nasa.py
   services/
-    random_engine.py      # picks dog / meal / space
+    random_engine.py      # picks dog / meal / space / fact
 .env                      # local secrets (not committed)
 requirements.txt
 ```
@@ -159,9 +181,11 @@ DOG_API_URL=https://dog.ceo/api/breeds/image/random
 MEAL_API_URL=https://www.themealdb.com/api/json/v1/1/random.php
 NASA_API_URL=https://api.nasa.gov/planetary/apod
 NASA_API_KEY=your_nasa_api_key
+NINJA_FACTS_URL=https://api.api-ninjas.com/v1/facts
+NINJA_API_KEY=your_api_ninjas_key
 ```
 
-Get a NASA API key at [https://api.nasa.gov/](https://api.nasa.gov/). Do not commit `.env`.
+Get a NASA API key at [https://api.nasa.gov/](https://api.nasa.gov/) and an API Ninjas key at [https://www.api-ninjas.com/](https://www.api-ninjas.com/). Do not commit `.env`. On Render, set the same variables in the service environment.
 
 ## Run locally
 

@@ -17,6 +17,6 @@ async def get_random_category_route(category: str):
     if category not in VALID_CATEGORIES:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid category '{category}'. Must be one of: dog, meal, space.",
+            detail=f"Invalid category '{category}'. Must be one of: {', '.join(VALID_CATEGORIES)}.",
         )
     return await get_random_engine(category)
