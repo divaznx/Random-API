@@ -28,11 +28,28 @@ Health / version check. Confirms the service is running.
 }
 ```
 
-### `GET /random/dog`
+### `GET /random/{category}`
 
-Fetches a random dog photo from [Dog CEO](https://dog.ceo/dog-api/).
+Fetches a random item for one category. Valid values: `dog`, `meal`, `space` (case-insensitive).
 
-**Live:** [https://random-insights-api.onrender.com/random/dog](https://random-insights-api.onrender.com/random/dog)
+**Live examples:**
+- [https://random-insights-api.onrender.com/random/dog](https://random-insights-api.onrender.com/random/dog)
+- [https://random-insights-api.onrender.com/random/meal](https://random-insights-api.onrender.com/random/meal)
+- [https://random-insights-api.onrender.com/random/space](https://random-insights-api.onrender.com/random/space)
+
+Invalid values (for example `/random/cat`) return **400**:
+
+```json
+{
+  "detail": "Invalid category 'cat'. Must be one of: dog, meal, space."
+}
+```
+
+If an upstream API is unreachable or returns bad data, the API returns **502**. Missing server configuration returns **500**.
+
+#### `dog`
+
+Random dog photo from [Dog CEO](https://dog.ceo/dog-api/).
 
 ```json
 {
@@ -50,11 +67,9 @@ Fetches a random dog photo from [Dog CEO](https://dog.ceo/dog-api/).
 | `status` | Upstream HTTP status |
 | `source` | `"Dog CEO"` |
 
-### `GET /random/meal`
+#### `meal`
 
-Fetches a random recipe from [TheMealDB](https://www.themealdb.com/api.php), including name, image, first nine ingredients, and cooking instructions.
-
-**Live:** [https://random-insights-api.onrender.com/random/meal](https://random-insights-api.onrender.com/random/meal)
+Random recipe from [TheMealDB](https://www.themealdb.com/api.php), including name, image, up to nine non-empty ingredients, and cooking instructions.
 
 ```json
 {
@@ -73,16 +88,14 @@ Fetches a random recipe from [TheMealDB](https://www.themealdb.com/api.php), inc
 | `type` | Always `"meal"` |
 | `name` | Recipe title |
 | `image` | Thumbnail URL |
-| `ingredients` | Up to nine ingredient names (unused slots may be empty) |
+| `ingredients` | Up to nine non-empty ingredient names |
 | `instructions` | Cooking steps |
 | `status` | Upstream HTTP status |
 | `source` | `"The Meal DB"` |
 
-### `GET /random/space`
+#### `space`
 
-Fetches NASA’s Astronomy Picture of the Day ([APOD](https://api.nasa.gov/)). Requires a `NASA_API_KEY` in the environment.
-
-**Live:** [https://random-insights-api.onrender.com/random/space](https://random-insights-api.onrender.com/random/space)
+NASA’s Astronomy Picture of the Day ([APOD](https://api.nasa.gov/)). Requires a `NASA_API_KEY` in the environment.
 
 ```json
 {
