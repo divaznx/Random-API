@@ -1,6 +1,6 @@
 # Random Engine API
 
-A FastAPI service that returns random content from public APIs: a dog photo, a meal recipe, NASA’s Astronomy Picture of the Day, or a trivia fact. `GET /random` picks one of those providers at random.
+A FastAPI service that returns random content from public APIs: a dog photo, a meal recipe, NASA’s Astronomy Picture of the Day, a trivia fact, or city air quality. `GET /random` picks one of those providers at random.
 
 ## Live demo
 
@@ -30,19 +30,21 @@ Health / version check. Confirms the service is running.
 
 ### `GET /random/{category}`
 
-Fetches a random item for one category. Valid values: `dog`, `meal`, `space`, `fact` (case-insensitive).
+Fetches a random item for one category. Valid values: `dog`, `meal`, `space`, `fact`, `aqi` (case-insensitive).
 
 **Live examples:**
 - [https://random-insights-api.onrender.com/random/dog](https://random-insights-api.onrender.com/random/dog)
 - [https://random-insights-api.onrender.com/random/meal](https://random-insights-api.onrender.com/random/meal)
 - [https://random-insights-api.onrender.com/random/space](https://random-insights-api.onrender.com/random/space)
 - [https://random-insights-api.onrender.com/random/fact](https://random-insights-api.onrender.com/random/fact)
+- [https://random-insights-api.onrender.com/random/aqi](https://random-insights-api.onrender.com/random/aqi)
+- [https://random-insights-api.onrender.com/random/aqi?city=Chennai](https://random-insights-api.onrender.com/random/aqi?city=Chennai)
 
 Invalid values (for example `/random/cat`) return **400**:
 
 ```json
 {
-  "detail": "Invalid category 'cat'. Must be one of: dog, meal, space, fact."
+  "detail": "Invalid category 'cat'. Must be one of: dog, meal, space, fact, aqi."
 }
 ```
 
@@ -140,9 +142,37 @@ A random trivia fact from [API Ninjas](https://www.api-ninjas.com/api/facts). Re
 | `status` | Upstream HTTP status |
 | `source` | `"API Ninjas"` |
 
+#### `aqi`
+
+Air quality for a city from [API Ninjas Air Quality](https://www.api-ninjas.com/api/airquality). Requires `NINJA_API_KEY` and `NINJA_AQI_URL` in the environment.
+
+`GET /random/aqi` picks a city at random. Pass `?city=Chennai` (or another city name) to request a specific place.
+
+```json
+{
+  "type": "aqi",
+  "city": "Chennai",
+  "overall_aqi": 54,
+  "pollutants": {},
+  "status": 200,
+  "source": "API Ninjas"
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `type` | Always `"aqi"` |
+| `city` | City used for the lookup |
+| `overall_aqi` | Combined air quality index |
+| `pollutants` | Per-pollutant concentration and AQI |
+| `status` | Upstream HTTP status |
+| `source` | `"API Ninjas"` |
+
+Unknown cities return **404**.
+
 ### `GET /random`
 
-Randomly chooses one of the four providers (`dog`, `meal`, `space`, or `fact`) and returns that provider’s JSON. The `type` field tells you which one you got.
+Randomly chooses one of the five providers (`dog`, `meal`, `space`, `fact`, or `aqi`) and returns that provider’s JSON. The `type` field tells you which one you got.
 
 **Live:** [https://random-insights-api.onrender.com/random](https://random-insights-api.onrender.com/random)
 
@@ -152,12 +182,13 @@ Randomly chooses one of the four providers (`dog`, `meal`, `space`, or `fact`) a
 app/
   main.py                 # FastAPI routes
   providers/
+    aqi.py
     dog.py
     fact.py
     meal.py
     nasa.py
   services/
-    random_engine.py      # picks dog / meal / space / fact
+    random_engine.py      # picks dog / meal / space / fact / aqi
 .env                      # local secrets (not committed)
 requirements.txt
 ```
@@ -182,6 +213,7 @@ MEAL_API_URL=https://www.themealdb.com/api/json/v1/1/random.php
 NASA_API_URL=https://api.nasa.gov/planetary/apod
 NASA_API_KEY=your_nasa_api_key
 NINJA_FACTS_URL=https://api.api-ninjas.com/v1/facts
+NINJA_AQI_URL=https://api.api-ninjas.com/v1/airquality
 NINJA_API_KEY=your_api_ninjas_key
 ```
 
